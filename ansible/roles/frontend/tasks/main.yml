@@ -1,0 +1,27 @@
+---
+- name: Install nginx (Debian)
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install nginx (RHEL family)
+  yum:
+    name: nginx
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Render nginx config with upstreams to backend group
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure nginx running
+  systemd:
+    name: nginx
+    enabled: yes
+    state: restarted

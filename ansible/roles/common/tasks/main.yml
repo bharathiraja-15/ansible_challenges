@@ -1,0 +1,30 @@
+---
+- name: Disable SELinux if present (persistent)
+  when: ansible_facts['os_family'] == 'RedHat'
+  block:
+    - name: Set SELINUX=disabled in /etc/selinux/config
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=disabled'
+        backup: yes
+
+    - name: Setenforce to 0 (runtime)
+      command: setenforce 0
+      ignore_errors: true
+
+- name: Disable firewalld if present (systemd)
+  block:
+    - name: Stop firewalld
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: false
+      ignore_errors: true
+
+- name: Disable UFW on Ubuntu if active
+  when: ansible_facts['os_family'] == 'Debian'
+  block:
+    - name: Stop ufw
+      command: ufw disable
+      ignore_errors: true

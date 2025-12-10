@@ -1,0 +1,30 @@
+---
+- name: Ensure curl is installed (Debian)
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install netdata (Debian/Ubuntu) via package repo (recommended)
+  when: ansible_facts['os_family'] == 'Debian'
+  block:
+    - name: Download netdata repo package (generic approach)
+      get_url:
+        url: https://packagecloud.io/netdata/netdata/install/repositories/ubuntu/jammy/script.deb.sh
+        dest: /tmp/netdata-install.sh
+        mode: '0755'
+      ignore_errors: true
+
+    - name: Run netdata installer script (this adds the repo & installs)
+      command: bash /tmp/netdata-install.sh --install-version=latest
+      args:
+        creates: /usr/sbin/netdata
+      become: yes
+
+- name: Ensure netdata service is running
+  systemd:
+    name: netdata
+    enabled: yes
+    state: started
+  ignore_errors: true

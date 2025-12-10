@@ -1,0 +1,20 @@
+# Terraform local directories
+.terraform/
+.terraform.lock.hcl
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Sensitive files
+*.pem
+*.key
+*.secret
+
+# Ansible temporary files
+*.retry
+inventory.ini
